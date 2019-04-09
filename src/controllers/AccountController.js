@@ -8,9 +8,7 @@ const validationUtil = require('../util/ValidationUtil')
 
 module.exports = {
   createAccount: async (data) => {
-    let validation = await validateAccountCreation(data)
-    if(!validation.success)
-      return {error: validation.error}
+    await validateAccountCreation(data)
 
     let salt = hashUtil.generateSalt()
     let hashedPassword = hashUtil.hashPassword(data.password, salt)
@@ -21,18 +19,8 @@ module.exports = {
     return session.createSession(data);
   },
 
-  changePassword: async (token, data) => {
-    if(data.newPassword != data.confirmPassword)
-      return {error: errors.PASSWORD_MUST_MATCH}
-
-    let account = await dbUtil.getOne(queries.FIND_ACCOUNT_BY_SESSION_TOKEN, [token])
-    if(account == null) 
-      return {error: errors.FORBIDDEN}
-
-    let hashedPassword = hashUtil.hashPassword(data.oldPassword, account.salt)
-
-    if(hashedPassword !== account.password) 
-      return {error: errors.BAD_OLD_PASSWORD}
+  changePassword: async (account, data) => {
+    validateChangePassword(account, data)
 
     let salt = hashUtil.generateSalt()
     let hashedNewPassword = hashUtil.hashPassword(data.newPassword, salt)
@@ -42,15 +30,54 @@ module.exports = {
 }
 
 async function validateAccountCreation(data) {
-  let account = await dbUtil.getOne(queries.FIND_ACCOUNT_BY_EMAIL, [data.username])
-  if(account != null) 
-    return validationUtil.error(errors.ACCOUNT_ALREADY_EXISTS)
+  let validationObject = validationUtil.initValidationObject(errors.FORM_ERRORS)
+  
+  if(data.username == null || data.username.length === 0) {
+    validationUtil.addFieldError(validationObject, 'username', {...errors.FIELD_REQUIRED, properties:['Username']})
+  } else if(data.username.length > 355) {
+    validationUtil.addFieldError(validationObject, 'username', {...errors.FIELD_TOO_LONG, properties:['Username', 355]})
+  } else {
+    let account = await dbUtil.getOne(queries.FIND_ACCOUNT_BY_EMAIL, [data.username])
+    if(account != null) 
+      validationUtil.addFieldError(validationObject, 'username', errors.ACCOUNT_ALREADY_EXISTS)
+  
+    if(!validationUtil.isValidEmail(data.username))
+      validationUtil.addFieldError(validationObject, 'username', errors.ACCOUNT_INVALID_EMAIL)
+  }
 
-  if(!validationUtil.isValidEmail(data.username))
-    return validationUtil.error(errors.ACCOUNT_INVALID_EMAIL)
+  if(data.password == null || data.password.length === 0) 
+    validationUtil.addFieldError(validationObject, 'password', {...errors.FIELD_REQUIRED, properties:['Password']})
 
+  if(data.confirmPassword == null || data.confirmPassword.length === 0) 
+      validationUtil.addFieldError(validationObject, 'confirmPassword', {...errors.FIELD_REQUIRED, properties:['Confirm Password']})
+  
   if(data.password != data.confirmPassword) 
-    return validationUtil.error(errors.ACCOUNT_PASSWORD_MUST_MATCH)
+    validationUtil.addFieldError(validationObject, 'confirmPassword', errors.ACCOUNT_PASSWORD_MUST_MATCH)
 
-  return validationUtil.success()
+  if(!validationObject.success)
+    throw validationObject.error
+}
+
+function validateChangePassword(account, data) {
+  let validationObject = validationUtil.initValidationObject(errors.FORM_ERRORS)
+
+  if(data.oldPassword == null || data.oldPassword.length === 0) {
+    validationUtil.addFieldError(validationObject, 'oldPassword', {...errors.FIELD_REQUIRED, properties:['Old Password']})
+  } else {
+    let hashedPassword = hashUtil.hashPassword(data.oldPassword, account.salt)
+    if(hashedPassword !== account.password) 
+      validationUtil.addFieldError(validationObject, 'oldPassword', errors.BAD_OLD_PASSWORD)
+  }
+  
+  if(data.newPassword == null || data.newPassword.length === 0) 
+    validationUtil.addFieldError(validationObject, 'newPassword', {...errors.FIELD_REQUIRED, properties:['New Password']})
+
+  if(data.confirmPassword == null || data.confirmPassword.length === 0) 
+      validationUtil.addFieldError(validationObject, 'confirmPassword', {...errors.FIELD_REQUIRED, properties:['Confirm New Password']})
+
+  if(data.newPassword != data.confirmPassword) 
+    validationUtil.addFieldError(validationObject, 'confirmPassword', errors.PASSWORD_MUST_MATCH)
+
+  if(!validationObject.success)
+    throw validationObject.error
 }

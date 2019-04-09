@@ -6,6 +6,13 @@ const pool = new Pool({
 })
 
 module.exports = {
+  getAll: async (sql, values) => {
+    const client = await pool.connect()
+    const result = await client.query(sql, values)
+    client.release()
+  
+    return result.rows.length === 0 ? [] : result.rows
+  },
   getOne: async (sql, values) => {
     const client = await pool.connect()
     const result = await client.query(sql, values)

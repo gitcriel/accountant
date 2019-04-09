@@ -5,16 +5,16 @@ const queries = require('../constants/Queries')
 module.exports = {
   apiWrapper: async (req, res, method) => {
     try {
-      let reply = await method(req.body)
-      if(reply.error) {
-        respondWithError(res, errors.HTTP.BAD_REQUEST, reply.error)
-      } else {
-        res.json(reply.data)
-        console.log(JSON.stringify(reply))
-      }
+      let data = await method(req.body)
+      res.json(data)
+      console.log(JSON.stringify(data))
     } catch (err) {
       console.error(err)
-      respondWithError(res, errors.HTTP.EXCEPTION, errors.EXCEPTION)
+
+      if(err.error) 
+        respondWithError(res, errors.HTTP.BAD_REQUEST, err)
+      else
+        respondWithError(res, errors.HTTP.EXCEPTION, errors.EXCEPTION)
     }
   },
 
@@ -24,20 +24,30 @@ module.exports = {
       if(sessionToken === null) {
         respondWithError(res, errors.HTTP.FORBIDDEN, errors.FORBIDDEN)
         return
-      }        
-        
-      let reply = await method(sessionToken, req.body)
-      if(reply.error) {
-        respondWithError(res, errors.HTTP.BAD_REQUEST, reply.error)
-      } else {
-        res.json(reply.data)
-        console.log(JSON.stringify(reply))
       }
-    } catch (err) {
+
+      let account = await dbUtil.getOne(queries.FIND_ACCOUNT_BY_SESSION_TOKEN, [sessionToken])
+      if(account == null) {
+        respondWithError(res, errors.HTTP.FORBIDDEN, errors.FORBIDDEN)
+        return
+      }
+
+      let data = await method(account, req.body, req.params.id, req.params.secondId)
+      console.log(JSON.stringify(data))
+      if(data != null)
+        res.json(data)
+      else
+        res.status(errors.HTTP.NO_DATA).send()
+
+    } catch (err) {      
       console.error(err)
-      respondWithError(res, errors.HTTP.EXCEPTION, errors.EXCEPTION)
+
+      if(err.error) 
+        respondWithError(res, errors.HTTP.BAD_REQUEST, err)
+      else
+        respondWithError(res, errors.HTTP.EXCEPTION, errors.EXCEPTION)
     }
-  },
+  }
 }
 
 async function getSessionToken(req) {
