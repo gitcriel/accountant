@@ -13,6 +13,7 @@ CREATE TABLE profile(
 
 CREATE TABLE category(
  id serial PRIMARY KEY,
+ account_id INTEGER REFERENCES account(id) ON UPDATE NO ACTION ON DELETE CASCADE,
  category_id INTEGER REFERENCES category(id) ON UPDATE NO ACTION ON DELETE CASCADE,
  name VARCHAR (200) NOT NULL
 );
@@ -25,6 +26,7 @@ CREATE TABLE pattern(
 
 CREATE TABLE institution(
  id serial PRIMARY KEY,
+ account_id INTEGER REFERENCES account(id) ON UPDATE NO ACTION ON DELETE CASCADE,
  name VARCHAR (200) NOT NULL,
  parsing_pattern  VARCHAR (200) NOT NULL
 );

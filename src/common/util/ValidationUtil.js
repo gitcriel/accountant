@@ -1,4 +1,4 @@
-const errors = require('../../constants/Errors/Errors')
+const errors = require('../constants/Errors')
 
 module.exports = {
   initValidationObject: (error) => {

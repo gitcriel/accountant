@@ -1,6 +1,6 @@
-const errors = require('../common/constants/Errors')
+const errors = require('../constants/Errors')
 const dbUtil = require('./DbUtil')
-const queries = require('../common/constants/Queries')
+const queries = require('../constants/Queries')
 
 module.exports = {
   apiWrapper: async (req, res, method) => {
@@ -33,11 +33,12 @@ module.exports = {
       }
 
       let data = await method(account, req.body, req.params.id, req.params.secondId)
-      console.log(JSON.stringify(data))
-      if(data != null)
+      if(data != null) {
+        console.log(JSON.stringify(data))
         res.json(data)
-      else
+      } else {
         res.status(errors.HTTP.NO_DATA).send()
+      }
 
     } catch (err) {      
       console.error(err)

@@ -11,14 +11,15 @@ module.exports = {
   EXCEPTION: { error: 'InternalServerError', description: 'A server error has occurred.'},
   FORBIDDEN: { error: 'Forbidden', description: 'Invalid session token.'},
   OBJECT_NOT_FOUND: { error: 'ObjectNotFound', description: '$1 with id $2 not found.'},
+  
+  INVALID_EMAIL: { error: 'InvalidEmail', description: 'Invalid E-Mail address.'},
+  FIELD_REQUIRED: {error: 'FieldRequired', description: '$1 is a required field'},
+  FIELD_TOO_LONG: {error: 'FieldTooLong', description: '$1 must be at most $2 characters long.'},
 
   BAD_OLD_PASSWORD: { error: 'BadOldPassword', description: 'Old password is incorrect.'},
   PASSWORD_MUST_MATCH: { error: 'PasswordMustMatch', description: 'New passwords must match.'},  
 
-  ACCOUNT_PASSWORD_MUST_MATCH: { error: 'AccountPasswordMustMatch', description: 'Passwords must match.'},
+  ACCOUNT_PASSWORD_MUST_MATCH: { error: 'PasswordMustMatch', description: 'Passwords must match.'},
   ACCOUNT_ALREADY_EXISTS: {error: 'AccountAlreadyExists', description: 'Account already exists.'},
-  ACCOUNT_INVALID_EMAIL: { error: 'AccountInvalidEmail', description: 'Invalid E-Mail address.'},
 
-  FIELD_REQUIRED: {error: 'FieldRequired', description: '$1 is a required field'},
-  FIELD_TOO_LONG: {error: 'FieldTooLong', description: '$1 must be at most $2 characters long.'}
 }
