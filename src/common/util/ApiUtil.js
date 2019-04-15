@@ -18,6 +18,26 @@ module.exports = {
     }
   },
 
+  apiAuthWrapperForToken: async (req, res, method) => {
+    try {
+      let sessionToken = await getSessionToken(req)
+      if(sessionToken === null) {
+        respondWithError(res, errors.HTTP.FORBIDDEN, errors.FORBIDDEN)
+        return
+      }
+
+      await method(sessionToken)
+      res.status(errors.HTTP.NO_DATA).send()
+    } catch (err) {      
+      console.error(err)
+
+      if(err.error) 
+        respondWithError(res, errors.HTTP.BAD_REQUEST, err)
+      else
+        respondWithError(res, errors.HTTP.EXCEPTION, errors.EXCEPTION)
+    }
+  },
+
   apiAuthWrapper: async (req, res, method) => {
     try {
       let sessionToken = await getSessionToken(req)

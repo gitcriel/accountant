@@ -2,8 +2,8 @@ const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
 const apiURI = require('./common/constants/ApiURI')
-const {apiWrapper, apiAuthWrapper} = require('./common/util/ApiUtil')
-const session = require('./session/SessionController')
+const {apiWrapper, apiAuthWrapperForToken, apiAuthWrapper} = require('./common/util/ApiUtil')
+const session = require('./account/SessionController')
 const account = require('./account/AccountController')
 const profile = require('./profile/ProfileController')
 const transaction = require('./transaction/TransactionController')
@@ -23,7 +23,7 @@ function startRecurringFunctions() {
 }
 
 app.post(apiURI.SESSION, async (req,res) => await apiWrapper(req, res, session.createSession))
-app.delete(apiURI.SESSION, async (req,res) => await apiAuthWrapper(req, res, session.destroySession))
+app.delete(apiURI.SESSION, async (req,res) => await apiAuthWrapperForToken(req, res, session.destroySession))
 
 app.post(apiURI.ACCOUNT_CHANGE_PASSWORD, async (req,res) => await apiAuthWrapper(req, res, account.changePassword))
 app.post(apiURI.ACCOUNT, async (req,res) => await apiWrapper(req, res, account.createAccount))

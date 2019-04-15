@@ -1,26 +1,21 @@
 const dbUtil = require('../common/util/DbUtil')
 const hashUtil = require('../common/util/HashUtil')
-const session = require('../session/SessionController')
+const session = require('./SessionController')
 const validator = require('./AccountValidation')
-
-const SCHEMA = {
-  TABLE_NAME: 'account',
-  FIELD_EMAIL: 'email',
-  FIELD_PASSWORD: 'password',
-  FIELD_SALT: 'salt',
-  FIELD_CREATED_DATE: 'created_date',
-  FIELD_LAST_LOGIN: 'last_login'
-}
+const metadata = require('./AccountMetadata')
 
 module.exports = {
   createAccount: async (data) => {
     await validator.validateCreateAccount(data)
 
+    let password = data[metadata.password.fieldName]
+    let username = data[metadata.username.fieldName]
+
     let salt = hashUtil.generateSalt()
-    let hashedPassword = hashUtil.hashPassword(data.password, salt)
-    account = await dbUtil.create(SCHEMA.TABLE_NAME, 
-                        [SCHEMA.FIELD_EMAIL, SCHEMA.FIELD_PASSWORD, SCHEMA.FIELD_SALT], 
-                        [data.username,hashedPassword,salt])
+    let hashedPassword = hashUtil.hashPassword(password, salt)
+    account = await dbUtil.create(metadata.tableName, 
+                        [metadata.username.dbName, metadata.password.dbName, metadata.salt.dbName], 
+                        [username,hashedPassword,salt])
 
     return session.createSession(data);
   },
@@ -28,10 +23,12 @@ module.exports = {
   changePassword: async (account, data) => {
     await validator.validateChangePassword(account, data)
 
+    let newPasword = data[metadata.newPassword.fieldName]
+
     let salt = hashUtil.generateSalt()
-    let hashedNewPassword = hashUtil.hashPassword(data.newPassword, salt)
-    await dbUtil.update(SCHEMA.TABLE_NAME, 
-                        [SCHEMA.FIELD_PASSWORD, SCHEMA.FIELD_SALT], 
+    let hashedNewPassword = hashUtil.hashPassword(newPasword, salt)
+    await dbUtil.update(metadata.tableName, 
+                        [metadata.password.dbName, metadata.salt.dbName], 
                         [account.id, hashedNewPassword, salt])
   }
 }
