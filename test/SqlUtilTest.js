@@ -1,51 +1,51 @@
-const expect = require('chai').expect
-const dbUtil = require('../src/common/util/SqlUtil')
-const queryVariables = require('../src/common/constants/GenericQueries').queryVariables
+const expect = require('chai').expect;
+const dbUtil = require('../src/common/util/SqlUtil');
+const queryVariables = require('../src/common/constants/GenericQueries').queryVariables;
 
-describe('specifyTable()', function () {
-  it('should replace table token with table name', function () {
-    let sql = 'something ' + queryVariables.table + ' something '
-    let tableName = 'test'
-    let expectedValue = 'something ' + tableName + ' something '
+describe('specifyTable()', function() {
+  it('should replace table token with table name', function() {
+    const sql = 'something ' + queryVariables.table + ' something ';
+    const tableName = 'test';
+    const expectedValue = 'something ' + tableName + ' something ';
 
-    let filledInSql = dbUtil.specifyTable(sql, tableName)
+    const filledInSql = dbUtil.specifyTable(sql, tableName);
 
-    expect(filledInSql).to.equal(expectedValue)
-  })
-})
+    expect(filledInSql).to.equal(expectedValue);
+  });
+});
 
-describe('specifyParent()', function () {
-  it('should replace parent token with column name', function () {
-    let sql = 'something ' + queryVariables.parentColumn + ' something '
-    let parentColumnName = 'test'
-    let expectedValue = 'something ' + parentColumnName + ' something '
+describe('specifyParent()', function() {
+  it('should replace parent token with column name', function() {
+    const sql = 'something ' + queryVariables.parentColumn + ' something ';
+    const parentColumnName = 'test';
+    const expectedValue = 'something ' + parentColumnName + ' something ';
 
-    let filledInSql = dbUtil.specifyParent(sql, parentColumnName)
+    const filledInSql = dbUtil.specifyParent(sql, parentColumnName);
 
-    expect(filledInSql).to.equal(expectedValue)
-  })
-})
+    expect(filledInSql).to.equal(expectedValue);
+  });
+});
 
-describe('specifyInsertColumns()', function () {
-  it('should replace insert sql tokens with column names and statement variables', function () {
-    let sql = 'something ' + queryVariables.insertColumns + ' something ' + queryVariables.insertValues
-    let columns = ['test1', 'test2', 'test3']
-    let expectedValue = 'something ' + columns.join() + ' something $1,$2,$3'
+describe('specifyInsertColumns()', function() {
+  it('should replace insert sql tokens with column names and statement variables', function() {
+    const sql = 'something ' + queryVariables.insertColumns + ' something ' + queryVariables.insertValues;
+    const columns = ['test1', 'test2', 'test3'];
+    const expectedValue = 'something ' + columns.join() + ' something $1,$2,$3';
 
-    let filledInSql = dbUtil.specifyInsertColumns(sql, columns)
+    const filledInSql = dbUtil.specifyInsertColumns(sql, columns);
 
-    expect(filledInSql).to.equal(expectedValue)
-  })
-})
+    expect(filledInSql).to.equal(expectedValue);
+  });
+});
 
-describe('specifyUpdateColumns()', function () {
-  it('should replace update sql tokens with column names and statement variables', function () {
-    let sql = 'something ' + queryVariables.updateColumns + ' something '
-    let columns = ['test1', 'test2', 'test3']
-    let expectedValue = 'something test1=$2,test2=$3,test3=$4 something '
+describe('specifyUpdateColumns()', function() {
+  it('should replace update sql tokens with column names and statement variables', function() {
+    const sql = 'something ' + queryVariables.updateColumns + ' something ';
+    const columns = ['test1', 'test2', 'test3'];
+    const expectedValue = 'something test1=$2,test2=$3,test3=$4 something ';
 
-    let filledInSql = dbUtil.specifyUpdateColumns(sql, columns)
+    const filledInSql = dbUtil.specifyUpdateColumns(sql, columns);
 
-    expect(filledInSql).to.equal(expectedValue)
-  })
-})
+    expect(filledInSql).to.equal(expectedValue);
+  });
+});

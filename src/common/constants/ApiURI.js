@@ -10,5 +10,5 @@ module.exports = {
   CATEGORIES: '/api/v1/categories',
   CATEGORY: '/api/v1/categories/:id',
   INSTITUTIONS: '/api/v1/institutions',
-  INSTITUTION: '/api/v1/institutions/:id'
-}
+  INSTITUTION: '/api/v1/institutions/:id',
+};
